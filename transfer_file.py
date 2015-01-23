@@ -17,6 +17,8 @@ def log_it():
     return
 def send_files(list):
     print (list, "\n")
+    for file in list:
+      print ("file =", file)
     return
 
 def landing_check(list):
@@ -33,16 +35,17 @@ def preflight():
       print ("Problem found...aborting\n")
       return 1
     return 0
-
-def get_list(config_path):
+def readpath(config_file):
     import configparser 
     cfg = configparser.ConfigParser()
-    list = []
-    cfg.read(config_path)
+    cfg.read(config_file)
     path = cfg['FROM_T3']['path_to_files']
+    return path
+  
+def get_list(path):
     
     print ("Path from config is = ", path, "\n")
-    
+    list=[]
     list = os.listdir(path)
 #      print ("path to walk = ", path)
 #      for name in files :
@@ -51,8 +54,11 @@ def get_list(config_path):
     return(list)
 
 preflight()
-print ("Hello World \n")
-files = get_list(config_file)
+
+
+path = readpath( config_file )
+files = get_list(path)
+
 send_files(files)
 landing_check(files)
 remove_stale_files(files)
