@@ -27,14 +27,23 @@ def landing_check(list):
 def send_files(list,config_file):
     path_head = readcfg(config_file,"path_to_files")
     SURL = readcfg(config_file,"destinationSURL")
+    created_files = []
     for file in list:
+      exit_status = 0
       defineMethod = readcfg(config_file,"method")
-      if defineMethod == "mv":
-        print("using mv, sending" , path_head+file, " to ", SURL+file, "\n")
-        mv_exit = subprocess.call(["mv", path_head+file, SURL+file])
-        if mv_exit:
-          print ("mv non-zero exit code")  
-          exit(1)
+      if defineMethod == "cp":
+        print("using cp, sending" , path_head+file, " to ", SURL+file, "\n")
+        exit_status = subprocess.call(["cp", path_head+file, SURL+file])
+        created_files.append(SURL+file)
+
+      if defineMethod == "srmv2":
+        print("using srmv2, sending" , path_head+file, " to ", SURL+file, "\n")
+        exit_status = subprocess.call(["srm", path_head+file, SURL+file])
+        created_files.append(SURL+file)
+      if exit_status:
+        print("Error in file transfer for file , ", file )
+        exit(1)
+        
     return
 
 
@@ -68,7 +77,15 @@ def get_list(path):
     list = os.listdir(path)
     return(list)
 
-
+def get_which_number(list):
+    week=-99
+    test=-100
+    for item in list:
+      list_substring = item.split("_")
+      print ("Substring item #3 = ", list_substring[1])
+    week = list_substring[1]
+    return week
+    
 #Workflow starts here.  
 
 if preflight(config_file):
@@ -76,6 +93,7 @@ if preflight(config_file):
   exit(1)
 
 files = get_list(readcfg(config_file,"path_to_files"))
+week = get_which_number(files)
 send_files(files, config_file)
 remove_stale_files(files)
 log_it()
