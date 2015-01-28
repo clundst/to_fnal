@@ -12,8 +12,8 @@ import configparser
 
 
 config_file = "/home/clundst/to_fnal/to_fnal.config"
-
-#Subroutines for tasking
+mode = testing
+#Subroutines fTor tasking
 
 def log_it():
     print ("Job's Done\n")
@@ -37,8 +37,9 @@ def send_files(list,config_file):
         created_files.append(SURL+file)
 
       if defineMethod == "srmv2":
+        
         print("using srmv2, sending" , path_head+file, " to ", SURL+file, "\n")
-        exit_status = subprocess.call(["srm", path_head+file, SURL+file])
+        exit_status = subprocess.call(["lcg-cp -D srmv2 -b " , path_head+file, SURL+file])
         created_files.append(SURL+file)
       if exit_status:
         print("Error in file transfer for file , ", file )
