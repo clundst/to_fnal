@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/opt/python3/bin//python3
 ##NOTE: Uses configparser forcing python3
 
 
@@ -11,8 +11,8 @@ import subprocess
 import configparser
 
 
-config_file = "/home/clundst/to_fnal/to_fnal.config"
-mode = testing
+config_file = "/home/hep/clundst/to_fnal/to_fnal/to_fnal.config"
+mode = "testing"
 #Subroutines fTor tasking
 
 def log_it():
@@ -25,27 +25,29 @@ def landing_check(list):
   
   
 def send_files(list,config_file):
-    path_head = readcfg(config_file,"path_to_files")
-    SURL = readcfg(config_file,"destinationSURL")
-    created_files = []
-    for file in list:
-      exit_status = 0
-      defineMethod = readcfg(config_file,"method")
-      if defineMethod == "cp":
-        print("using cp, sending" , path_head+file, " to ", SURL+file, "\n")
-        exit_status = subprocess.call(["cp", path_head+file, SURL+file])
-        created_files.append(SURL+file)
+	path_head = readcfg(config_file,"path_to_files")
+	SURL = readcfg(config_file,"destinationSURL")
+	created_files = []
+	for file in list:
+		exit_status = 0
+		defineMethod = readcfg(config_file,"method")
+		if defineMethod == "cp":
+        		print("using cp, sending" , path_head+file, " to ", SURL+file, "\n")
+        		exit_status = subprocess.call(["cp", path_head+file, SURL+file])
+        		created_files.append(SURL+file)
 
-      if defineMethod == "srmv2":
-        
-        print("using srmv2, sending" , path_head+file, " to ", SURL+file, "\n")
-        exit_status = subprocess.call(["lcg-cp -D srmv2 -b " , path_head+file, SURL+file])
-        created_files.append(SURL+file)
-      if exit_status:
-        print("Error in file transfer for file , ", file )
-        exit(1)
-        
-    return
+		if defineMethod == "srmv2":
+			full_source_text = "file:/"+path_head+file
+			full_dst_text = SURL + file
+			print("using srmv2, sending " , full_source_text, " to ", full_dst_text, "\n")
+			lcgCmd = "lcg-cp  -b  -D srmv2 " + full_source_text + " " + full_dst_text 
+			print ("lcg-cmd = ", lcgCmd )
+			os.system(lcgCmd)
+			created_files.append(SURL+file)
+	if exit_status:
+		print("Error in file transfer for file , ", full_source_text )
+		exit(1)
+	return
 
 
   
@@ -70,7 +72,7 @@ def readcfg(config_file,target):
     import configparser 
     cfg = configparser.ConfigParser()
     cfg.read(config_file)
-    path = cfg['FROM_T3'][target]
+    path = cfg[mode][target]
     return path
   
 def get_list(path):
