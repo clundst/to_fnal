@@ -3,10 +3,10 @@
 
 import os
 import subprocess
-import transfer_file.py
+import transfer_file
 
 
 
 config_file = "/home/hep/clundst/to_fnal/to_fnal/to_fnal.config"
-
-get_upstream_file(config_file)
+files_on_server = transfer_file.get_upstream_file(config_file)
+print ("Files on Server : ", files_on_server)

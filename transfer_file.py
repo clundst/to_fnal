@@ -1,4 +1,4 @@
-#!/opt/python3/bin//python3
+#!/opt/python3/bin/python3
 ##NOTE: Uses configparser forcing python3
 
 
@@ -9,7 +9,7 @@
 import os
 import subprocess
 import configparser
-
+import lcg_util_wrapper
 
 mode = "testing"
 #Subroutines fTor tasking
@@ -27,6 +27,7 @@ def send_files(list,config_file):
 	path_head = readcfg(config_file,"path_to_files")
 	SURL = readcfg(config_file,"destinationSURL")
 	created_files = []
+	error_message = ""
 	for file in list:
 		exit_status = 0
 		defineMethod = readcfg(config_file,"method")
@@ -39,9 +40,10 @@ def send_files(list,config_file):
 			full_source_text = "file:/"+path_head+file
 			full_dst_text = SURL + file
 			print("using srmv2, sending " , full_source_text, " to ", full_dst_text, "\n")
-			lcgCmd = "lcg-cp  -b  -D srmv2 " + full_source_text + " " + full_dst_text 
-			print ("lcg-cmd = ", lcgCmd )
-			os.system(lcgCmd)
+#			lcgCmd = "lcg-cp  -b  -D srmv2 " + full_source_text + " " + full_dst_text 
+			(exit_status,error_message) = lcg_util_wrapper.lcg_copy(full_source_text, full_dst_text, 'srmv2', 'none', 'srmv2', nobdii, 1, 0, hcc, 'ignored', 'ignored', NULL , NULL)  		
+#			print ("lcg-cmd = ", lcgCmd )
+#			os.system(lcgCmd)
 			created_files.append(SURL+file)
 	if exit_status:
 		print("Error in file transfer for file , ", full_source_text )
@@ -89,14 +91,9 @@ def get_which_number(list):
     return week
 
 def get_upstream_file(config_file):
-        files_on_server = []
-        SURL = readcfg(config_file,"destinationSURL")
-        lcgCmd = "lcg-ls  -b  -D srmv2 " + SURL
-        files_on_server = os.system(lcgCmd)
-        return files_on_server
+	files_on_server = []
 
-server_ls = []
-server_ls = get_upstream_file(config_file)
-
-print("server_ls = ", server_ls)
-exit()
+	SURL = readcfg(config_file,"destinationSURL")
+	lcgCmd = "lcg-ls  -b  -D srmv2 " + SURL
+	files_on_server = subprocess.check_output(lcgCmd, shell=True)
+	return files_on_server
