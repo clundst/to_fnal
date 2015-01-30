@@ -11,7 +11,6 @@ import subprocess
 import configparser
 
 
-config_file = "/home/hep/clundst/to_fnal/to_fnal/to_fnal.config"
 mode = "testing"
 #Subroutines fTor tasking
 
@@ -88,18 +87,16 @@ def get_which_number(list):
       print ("Substring item #3 = ", list_substring[1])
     week = list_substring[1]
     return week
-    
-#Workflow starts here.  
 
-if preflight(config_file):
-  print ("Problems found in preflight tests.")
-  exit(1)
+def get_upstream_file(config_file):
+        files_on_server = []
+        SURL = readcfg(config_file,"destinationSURL")
+        lcgCmd = "lcg-ls  -b  -D srmv2 " + SURL
+        files_on_server = os.system(lcgCmd)
+        return files_on_server
 
-files = get_list(readcfg(config_file,"path_to_files"))
-week = get_which_number(files)
-send_files(files, config_file)
-remove_stale_files(files)
-log_it()
+server_ls = []
+server_ls = get_upstream_file(config_file)
+
+print("server_ls = ", server_ls)
 exit()
-
-
