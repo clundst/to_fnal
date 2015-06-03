@@ -1,5 +1,4 @@
-#!/opt/python3/bin/python3
-##NOTE: Uses configparser forcing python3
+#!/usr/bin/python
 
 
 #import preflight
@@ -8,10 +7,9 @@
 #import finish_up
 import os
 import subprocess
-import configparser
-import lcg_util_wrapper
+import ConfigParser
 
-mode = "testing"
+mode = "FROM_T3"
 #Subroutines fTor tasking
 
 def log_it():
@@ -41,10 +39,17 @@ def send_files(list,config_file):
 			full_dst_text = SURL + file
 			print("using srmv2, sending " , full_source_text, " to ", full_dst_text, "\n")
 #			lcgCmd = "lcg-cp  -b  -D srmv2 " + full_source_text + " " + full_dst_text 
-			(exit_status,error_message) = lcg_util_wrapper.lcg_copy(full_source_text, full_dst_text, 'srmv2', 'none', 'srmv2', nobdii, 1, 0, hcc, 'ignored', 'ignored', NULL , NULL)  		
+#			(exit_status,error_message) = lcg_util_wrapper.lcg_copy(full_source_text, full_dst_text, 'srmv2', 'none', 'srmv2', nobdii, 1, 0, hcc, 'ignored', 'ignored', NULL , NULL)  		
 #			print ("lcg-cmd = ", lcgCmd )
 #			os.system(lcgCmd)
 			created_files.append(SURL+file)
+		if defineMethod == "xrdcp":
+			full_source_text = path_head+file
+			full_dst_text = SURL + file
+			print("using xrdcp, sending " , full_source_text, " to ", full_dst_text, "\n")
+			created_files.append(SURL+file)
+			exit_status = subprocess.call(["xrdcp", path_head+file, SURL+file])
+
 	if exit_status:
 		print("Error in file transfer for file , ", full_source_text )
 		exit(1)
@@ -70,10 +75,9 @@ def preflight(config_file):
   
   
 def readcfg(config_file,target):
-    import configparser 
-    cfg = configparser.ConfigParser()
+    cfg = ConfigParser.ConfigParser()
     cfg.read(config_file)
-    path = cfg[mode][target]
+    path = cfg.get(mode,target)
     return path
   
 def get_list(path):

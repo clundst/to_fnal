@@ -1,4 +1,4 @@
-#!/opt/python3/bin/python3
+#!/usr/bin/python
 ##NOTE: Uses configparser forcing python3
 
 import os
