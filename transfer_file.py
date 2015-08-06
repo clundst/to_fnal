@@ -96,8 +96,14 @@ def get_which_number(list):
 
 def get_upstream_file(config_file):
 	files_on_server = []
-
 	SURL = readcfg(config_file,"destinationSURL")
-	lcgCmd = "lcg-ls  -b  -D srmv2 " + SURL
-	files_on_server = subprocess.check_output(lcgCmd, shell=True)
+	defineMethod = "xrdcp"
+#	defineMethod = readcfg(config_file,"method")
+	if defineMethod == "srmv2":
+		lcgCmd = "lcg-ls  -b  -D srmv2 " + SURL
+		files_on_server = os.system(lcgCmd)
+	if defineMethod == "xrdcp":
+		server,directory = SURL.split(':1094')
+		lcgCmd = "xrdfs " + server + ":1094 ls " + directory
+		files_on_server = os.system(lcgCmd)
 	return files_on_server
